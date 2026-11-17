@@ -1,0 +1,35 @@
+# Dart and Flutter generated files.
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+coverage/
+doc/api/
+
+# Android machine state and generated files.
+android/.gradle/
+android/.kotlin/
+android/captures/
+android/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+*.iml
+.idea/
+
+# Signing and credentials.
+android/key.properties
+*.jks
+*.keystore
+.env
+.env.*
+!.env.example
+
+# Local tools, setup artifacts, and operating-system files.
+.dayflow-setup/
+.DS_Store
+Thumbs.db
+*.log
