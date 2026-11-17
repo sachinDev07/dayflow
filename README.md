@@ -8,11 +8,11 @@ Android-first, offline-first personal productivity companion built with Flutter,
 
 [DAYFLOW_PROJECT_DETAILS.md](DAYFLOW_PROJECT_DETAILS.md) is the approved product specification. [M1_IMPLEMENTATION_PLAN.md](M1_IMPLEMENTATION_PLAN.md) records the initial assessment and ordered setup plan.
 
-The M1 application shell is implemented and verified on Android. The remaining M1 housekeeping is the initial Git commit, pending the intended author name and email. The project uses Kotlin and application ID `com.dayflow.dayflow`.
+M1 is complete and committed in `4bf3f06`. M2 implements the design system using the supplied [design references](design-preferences/) and [approved logo](design-preferences/dayflow_app_icon.png). The project uses Kotlin and application ID `com.dayflow.dayflow`. See [M2_DESIGN_SYSTEM.md](M2_DESIGN_SYSTEM.md) for reference precedence, component decisions, asset provenance, and milestone boundaries.
 
-The shell opens Home and provides Home, Calendar, Notes, Insights, and Settings navigation through GoRouter, with Riverpod provisioning and disposal of the router. Top-level tab changes replace the destination rather than accumulating history. Android Back returns to Home from another tab, then exits from Home. The UI uses restrained light styling and text branding; feature destinations are clearly marked as coming soon.
+The shell opens Home and provides Home, Calendar, Notes, Insights, and Settings navigation through GoRouter, with Riverpod provisioning and disposal of the router. Top-level tab changes replace the destination rather than accumulating history. Android Back returns to Home from another tab, then exits from Home. The shell now uses the supplied logo, bundled Plus Jakarta Sans, Lucide line icons, compact headings, pale lavender surfaces, and purple selected navigation. Feature destinations remain clearly marked as coming soon.
 
-Later milestones cover the full design system, persistence, task management, calendar, notes, reminders, insights, and native floating companion. Those features are not implemented in this shell.
+Both light and dark design themes exist, with light as the product default. Theme persistence and user-facing appearance settings belong to M7. Shared surfaces, primary buttons, labeled/validated inputs, empty states, keyboard-aware sheets, and reduced-motion launch treatment are ready for the later features. Persistence, task management, calendar, notes, reminders, insights, and native companion functionality remain unimplemented.
 
 ## Development environment
 
@@ -92,7 +92,7 @@ flutter run -d <android-device-id>
 
 Use an actual Android ID reported by `flutter devices` in place of the placeholder. Dependency versions are resolved in `pubspec.lock`. The Android Gradle template currently pins Gradle 9.5.0 and AGP 9.3.1 with Kotlin plugin metadata 2.4.20; Java/Kotlin compilation targets version 17. Flutter supplies minimum API 24 and compile/target API 36.
 
-The generated starter passed analysis, its widget smoke test, and an Android debug build before replacement. The final shell then passed:
+The generated starter passed analysis, its widget smoke test, and an Android debug build before replacement. M1 verification then passed:
 
 - Formatting verification: 9 Dart files, no changes required.
 - `flutter analyze`: no issues found.
@@ -103,19 +103,45 @@ The generated starter passed analysis, its widget smoke test, and an Android deb
 
 The local APK is `build/app/outputs/flutter-apk/app-debug.apk`; a verified Home screenshot is `build/m1-home.png`. Both are ignored build artifacts. The initial shell has no persistence or task functionality to test yet.
 
-The resolved shell dependencies are Riverpod 3.5.0 and GoRouter 18.1.4. Flutter 3.50's generated template uses the `material_ui` package (resolved to 1.11.0); the shell retains that UI foundation. No code generators, databases, charts, notifications, or overlay packages were added.
+The resolved dependencies include Riverpod 3.5.0, GoRouter 18.1.4, and Lucide Icons Flutter 4.0.3. Flutter 3.50's generated template uses `material_ui` (resolved to 1.11.0); the shell retains that UI foundation. No code generators, databases, charts, notifications, or overlay packages were added.
+
+## M2 design-system preview
+
+The app's shared design system follows `design-preferences/`, using the v4 task-flow board over earlier revisions. Poster backgrounds, sample tasks, and sample statistics are not copied into application data. Buttons use a darker purple gradient than the posters for readable white labels.
+
+The separate developer preview allows checking component states and light/dark themes without introducing unfinished feature controls into product routes:
+
+```powershell
+flutter run -t tool/design_preview.dart -d <android-device-id>
+```
+
+The preview's controls are temporary UI state only. Run the normal app again with `flutter run -t lib/main.dart` after previewing. Include `tool` when checking formatting: `dart format --output=none --set-exit-if-changed lib test tool`.
+
+M2 verification completed on 18 November 2026:
+
+- Formatting: 21 Dart files, no changes required; static analysis: no issues.
+- All 8 tests passed, covering theme contrast, offline asset loading, light-default/system-theme behavior, reduced motion, validation and sheet reachability, disabled actions, tab navigation, and large text. A large-text wordmark overflow found during development was corrected.
+- Both the separate component-preview APK and final main Android debug APK built successfully.
+- Android 16/API 36 emulator: light/dark component previews reviewed, keyboard-aware sheet opened and closed with its action above the keyboard, final Home reviewed, all five destinations exercised, and Android Back returned to Home. No Flutter layout errors appeared in the checked runtime logs.
+- The final APK contains the exact approved logo, both offline fonts, and the font license. The preview was replaced with the main APK after component verification.
+
+Local screenshots are `build/m2-home.png`, `build/m2-preview-light.png`, `build/m2-preview-dark.png`, and `build/m2-preview-sheet.png`. The main app is `build/app/outputs/flutter-apk/app-debug.apk`; `build/m2-components-preview.apk` is for component review only. Build artifacts are ignored by Git.
+
+The emulator had slow cold boots and System UI timeouts on this host. Builds and emulator checks were serialized after memory pressure was observed; Gradle was stopped before device verification. Successful checks used the 720×1600 software-rendered Android 16 emulator. Physical devices and older Android versions have not been exercised in M2, and these results do not establish production startup performance.
 
 ## Version control
 
-The local branch is `main`. No remote has been configured. No commits have been created because the intended author name and email have not been supplied. Do not invent an author identity or change global Git identity during setup.
+The local branch is `main`; the user has configured the Git author and an `origin` remote and committed the initial project as `4bf3f06`. M2 changes are local and have not been pushed.
 
-The reviewed source baseline is staged. Git trust is limited to this exact workspace through a `safe.directory` entry because the repository was initially created by the sandbox account. The approved brief's original content and existing whitespace are preserved.
+Git trust is limited to this exact workspace through a `safe.directory` entry because the repository was initially created by the sandbox account. The approved brief's original content and existing whitespace are preserved.
 
 Generated files, local SDK paths, build outputs, caches, and signing credentials are excluded by `.gitignore`. The application lockfile and complete Gradle wrapper are included in the source baseline. No remote has been contacted for publication.
 
 ## Brand assets
 
-The official logo and font files have not been supplied. M1 uses text branding and system typography. The generated Flutter launcher icon/native launch artwork remain temporary development assets. M2 will integrate the exact approved logo and typography through the future `assets/images/` and `assets/fonts/` locations; no replacement logo was drawn.
+The exact supplied `dayflow_app_icon.png` is bundled unchanged for Flutter and Android launch. The header frames its central icon at runtime. Native splash configuration uses the original artwork, including on Android 12+, and the ready brand header fades in over 220ms without holding startup. Reduced motion skips the fade. A true circle/checkmark stroke draw would require the approved vector paths; no substitute logo is drawn.
+
+Plus Jakarta Sans normal/italic fonts and their SIL license are bundled for offline use, with the license registered in Flutter's license registry. Provenance and checksums are in the M2 design-system document. Production launcher/store artwork remains M10; the generated launcher icon is still temporary.
 
 ## Setup references
 

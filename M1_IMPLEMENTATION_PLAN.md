@@ -2,7 +2,7 @@
 
 Prepared: 16 November 2026 (Asia/Calcutta).
 
-Status: M1 environment, Android configuration, and application shell are implemented and verified. The initial Git commit remains pending the intended author identity. See `README.md` for installed versions, verification evidence, and limitations. The assessment below records the initial state before installation.
+Status: M1 is complete. The environment, Android configuration, and application shell were verified, and the user committed the baseline as `4bf3f06`. See `README.md` for installed versions and verification evidence. The assessment below records the initial state before installation; M2 is documented separately.
 
 The complete `DAYFLOW_PROJECT_DETAILS.md` v1.0 is the product source of truth. This plan implements its M1 scope and does not revise the approved product direction.
 
@@ -186,13 +186,13 @@ Gate: checks pass, an Android run has been observed, and setup is reproducible f
 - [x] Project is initialized at the current workspace root; the approved brief is unchanged.
 - [x] Application ID/namespace/Kotlin package agree, and the launcher label is DAYFLOW.
 - [x] Initial shell uses the approved light, restrained visual direction and five destinations.
-- [ ] Git repository, real local author identity, ignore rules, and baseline commits are established.
-- [x] `pubspec.lock`, Gradle wrapper, source, tests, and setup documentation are tracked in the Git index; the initial commit awaits author identity.
+- [x] Git repository, real local author identity, ignore rules, and baseline commit `4bf3f06` are established.
+- [x] `pubspec.lock`, Gradle wrapper, source, tests, and setup documentation are committed in the M1 baseline.
 - [x] Formatting, static analysis, focused tests, and final Android debug build pass.
 - [x] Temporary assets, unresolved limitations, and verification evidence are documented.
 - [x] M2–M10 functionality has not been introduced ahead of its milestone.
 
-Checklist entries are updated only when verified. M1 is not complete until its remaining gates, including an observed Android run, pass.
+All M1 gates are satisfied. The initial assessment and ordered plan are retained as historical context; later milestone work is documented separately.
 
 ## 6. Official references checked for this plan
 

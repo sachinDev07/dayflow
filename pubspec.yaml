@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^3.5.0
   go_router: ^18.1.4
+  lucide_icons_flutter: ^4.0.3
   material_ui: ^1.1.0
 
 dev_dependencies:
@@ -55,6 +56,17 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/images/dayflow_app_icon.png
+    - assets/fonts/OFL.txt
+
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Variable.ttf
+        - asset: assets/fonts/PlusJakartaSans-Italic-Variable.ttf
+          style: italic
 
   # To add assets to your application, add an assets section, like this:
   # assets:

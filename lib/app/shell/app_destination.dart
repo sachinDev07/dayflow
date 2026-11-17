@@ -1,26 +1,22 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum AppDestination {
-  home('/home', 'Home', Icons.home_outlined, Icons.home_rounded),
+  home('/home', 'Home', LucideIcons.house, LucideIcons.house),
   calendar(
     '/calendar',
     'Calendar',
-    Icons.calendar_month_outlined,
-    Icons.calendar_month_rounded,
+    LucideIcons.calendarDays,
+    LucideIcons.calendarDays,
   ),
-  notes('/notes', 'Notes', Icons.notes_outlined, Icons.notes_rounded),
+  notes('/notes', 'Notes', LucideIcons.notebookPen, LucideIcons.notebookPen),
   insights(
     '/insights',
     'Insights',
-    Icons.bar_chart_outlined,
-    Icons.bar_chart_rounded,
+    LucideIcons.chartNoAxesColumnIncreasing,
+    LucideIcons.chartNoAxesColumnIncreasing,
   ),
-  settings(
-    '/settings',
-    'Settings',
-    Icons.settings_outlined,
-    Icons.settings_rounded,
-  );
+  settings('/settings', 'Settings', LucideIcons.settings, LucideIcons.settings);
 
   const AppDestination(this.path, this.label, this.icon, this.selectedIcon);
 
