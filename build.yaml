@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          databases:
+            app_database: lib/database/app_database.dart
+          schema_dir: drift_schemas/
+          test_dir: test/database/migrations/
+          generate_manager: false
