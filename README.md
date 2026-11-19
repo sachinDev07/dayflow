@@ -8,11 +8,11 @@ Android-first, offline-first personal productivity companion built with Flutter,
 
 [DAYFLOW_PROJECT_DETAILS.md](DAYFLOW_PROJECT_DETAILS.md) is the approved product specification. [M1_IMPLEMENTATION_PLAN.md](M1_IMPLEMENTATION_PLAN.md) records the initial assessment and ordered setup plan.
 
-M1 is complete and committed in `4bf3f06`. M2 implements the design system using the supplied [design references](design-preferences/) and [approved logo](design-preferences/dayflow_app_icon.png). The project uses Kotlin and application ID `com.dayflow.dayflow`. See [M2_DESIGN_SYSTEM.md](M2_DESIGN_SYSTEM.md) for reference precedence, component decisions, asset provenance, and milestone boundaries.
+M1 is complete and committed in `4bf3f06`. M2 implements the design system using the supplied [design references](design-preferences/) and [approved logo](design-preferences/dayflow_app_icon.png), committed in `0f54526`. M3 adds the offline database foundation in `af80e6c`. The project uses Kotlin and application ID `com.dayflow.dayflow`. See [M2_DESIGN_SYSTEM.md](M2_DESIGN_SYSTEM.md) for design decisions and [M3_DATABASE_FOUNDATION.md](M3_DATABASE_FOUNDATION.md) for persistence architecture, data rules, verification, and the future Kotlin database contract.
 
-The shell opens Home and provides Home, Calendar, Notes, Insights, and Settings navigation through GoRouter, with Riverpod provisioning and disposal of the router. Top-level tab changes replace the destination rather than accumulating history. Android Back returns to Home from another tab, then exits from Home. The shell now uses the supplied logo, bundled Plus Jakarta Sans, Lucide line icons, compact headings, pale lavender surfaces, and purple selected navigation. Feature destinations remain clearly marked as coming soon.
+The app opens Home and provides Home, Calendar, Notes, Insights, and Settings navigation through GoRouter, with Riverpod provisioning and disposal of the router. Top-level tab changes replace the destination rather than accumulating history. Android Back returns to Home from another tab, then exits from Home. The shell uses the supplied logo, bundled Plus Jakarta Sans, Lucide line icons, compact headings, pale lavender surfaces, and purple selected navigation. M4 connects Home to saved tasks; later destinations remain clearly marked as coming soon. See [M4_CORE_TASK_MANAGEMENT.md](M4_CORE_TASK_MANAGEMENT.md) for implementation decisions and verification.
 
-Both light and dark design themes exist, with light as the product default. Theme persistence and user-facing appearance settings belong to M7. Shared surfaces, primary buttons, labeled/validated inputs, empty states, keyboard-aware sheets, and reduced-motion launch treatment are ready for the later features. Persistence, task management, calendar, notes, reminders, insights, and native companion functionality remain unimplemented.
+Both light and dark design themes exist, with light as the product default. Stored theme preferences are available in M3; applying them and user-facing appearance settings belong to M7. Home now provides date selection, real task progress, pending/completed lists, Quick Add/Edit, completion/reopening, and delete/undo. The shared sheet follows the approved v4 task flow and protects unsaved drafts. Calendar, notes UI, reminders, insights, and the native companion remain later milestones.
 
 ## Development environment
 
@@ -50,6 +50,8 @@ C:\src\android-sdk\cmdline-tools\latest\bin
 `ANDROID_HOME` is set to `C:\src\android-sdk`. Existing PATH entries and the existing `JAVA_HOME` were preserved. Restart VS Code and open a new terminal to pick up these changes.
 
 Installed Android packages match the selected Flutter template: API 36 (revision 2), Build Tools 36.0.0, NDK 28.2.13676358, Platform Tools 37.0.1, Emulator 37.2.13, and one Google APIs x86_64 API 36 system image (revision 7). Direct SDK package verification returned exit code 0. Android SDK licenses are accepted, and Flutter's Android engine/build artifacts are cached.
+
+The M3 native dependency build additionally installed SDK Platform 35 and CMake 3.22.1. The application still compiles and targets API 36 with minimum API 24.
 
 The final `flutter doctor -v` passed the Flutter and Android toolchain checks with the updated PATH. Android Studio's installation directory is also configured explicitly in Flutter. A Windows desktop C++ tooling warning is unrelated to this Android-only project; those additional desktop components were not installed.
 
@@ -101,9 +103,9 @@ The generated starter passed analysis, its widget smoke test, and an Android deb
 - Android 16/API 36 emulator checks: all five tabs, selected-tab accessibility state, Back-to-Home, Back-from-Home exit, background/resume, and fresh process relaunch.
 - APK metadata: DAYFLOW label, `com.dayflow.dayflow`, minimum API 24, target API 36.
 
-The local APK is `build/app/outputs/flutter-apk/app-debug.apk`; a verified Home screenshot is `build/m1-home.png`. Both are ignored build artifacts. The initial shell has no persistence or task functionality to test yet.
+The local APK is `build/app/outputs/flutter-apk/app-debug.apk`; a verified M1 Home screenshot is `build/m1-home.png`. Both are ignored build artifacts. M1's initial shell had no persistence or task functionality.
 
-The resolved dependencies include Riverpod 3.5.0, GoRouter 18.1.4, and Lucide Icons Flutter 4.0.3. Flutter 3.50's generated template uses `material_ui` (resolved to 1.11.0); the shell retains that UI foundation. No code generators, databases, charts, notifications, or overlay packages were added.
+The resolved dependencies include Riverpod 3.5.0, GoRouter 18.1.4, and Lucide Icons Flutter 4.0.3. Flutter 3.50's generated template uses `material_ui` (resolved to 1.11.0); the shell retains that UI foundation. M3 adds Drift, drift_flutter, path_provider, UUID, and database code-generation/test tooling. Chart, notification, and overlay packages have not been added.
 
 ## M2 design-system preview
 
@@ -129,9 +131,47 @@ Local screenshots are `build/m2-home.png`, `build/m2-preview-light.png`, `build/
 
 The emulator had slow cold boots and System UI timeouts on this host. Builds and emulator checks were serialized after memory pressure was observed; Gradle was stopped before device verification. Successful checks used the 720×1600 software-rendered Android 16 emulator. Physical devices and older Android versions have not been exercised in M2, and these results do not establish production startup performance.
 
+## M3 database foundation
+
+SQLite schema version 1 contains tasks, notes, categories, and singleton app settings. Drift owns schema creation and future migrations. DAOs and repository interfaces support reactive reads, transactional writes, completion/reopening, soft deletion/restoration, and optional associations. No sample tasks or statistics are seeded. Calendar dates use validated `YYYY-MM-DD` text; timestamps use UTC epoch milliseconds.
+
+The single lazy Riverpod database uses the application support directory. Android's matching native location is `File(context.filesDir, "dayflow.sqlite")`; `context.getDatabasePath()` would select a different file. Kotlin access and concurrent writers still require M9 verification. M3 preserved the shell appearance; M4 connects the task repositories to Home and task forms without changing the schema.
+
+After changing table definitions, regenerate runtime code and preserve schema history:
+
+```powershell
+dart run build_runner build
+dart run drift_dev make-migrations
+dart run drift_dev schema generate drift_schemas/app_database test/database/migrations/generated
+dart format --output=none --set-exit-if-changed lib test tool
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+Future schema versions also need explicit migration steps and data-preservation tests; generation alone does not implement an upgrade. The committed v1 snapshot verifies new and existing v1 databases. File-backed tests check persistence and rejection of unsupported newer schemas without deleting data.
+
+For developer-only Android persistence verification:
+
+```powershell
+flutter run --no-resident -t tool/database_smoke.dart -d <android-device-id>
+```
+
+This tool creates uniquely identified temporary records, closes/reopens the real database, verifies persistence and integrity, then removes only its own fixtures. Run the regular application afterward with `flutter run -t lib/main.dart -d <android-device-id>`. See the M3 document for final verification results.
+
+## M4 task workflows
+
+Home uses reactive date queries and derives progress from actual non-deleted tasks. Quick Add defaults to the selected Home date and expands to priority, an existing category, and description. Editing preserves IDs, creation timestamps, completion state, and existing reminder metadata. Blank titles cannot be saved. Failed saves retain the draft, and dirty forms ask before discarding.
+
+Completed tasks can be expanded and reopened. Deletion asks for confirmation and provides Undo; there is no automatic task movement. Lists render lazily, with tests exercising 110 tasks. Today refreshes across midnight/resume while explicit date selections remain stable.
+
+Reminder controls/scheduling and category management remain M7; Calendar is M5 and will reuse this task form. No new packages, schema changes, native services, or permissions are added in M4. Detailed checks and local Android artifacts are recorded in the M4 document.
+
+M4 verification completed on 18 November 2026: all 38 tests passed, analysis and formatting passed, and the final Android debug APK built successfully. Android 16/API 36 emulator checks verified creation, completion/reopening, editing, delete/undo, and persistence after force-stop/relaunch. The temporary task was soft-deleted after verification. The final APK is `build/app/outputs/flutter-apk/app-debug.apk`; a final Home screenshot is `build/m4-home-final.png`. M5 (Calendar) is next.
+
 ## Version control
 
-The local branch is `main`; the user has configured the Git author and an `origin` remote and committed the initial project as `4bf3f06`. M2 changes are local and have not been pushed.
+The local branch is `main`; the user has configured the Git author and an `origin` remote. The local history contains M1 (`4bf3f06`), M2 (`0f54526`), and M3 database implementation (`af80e6c`). These checks do not establish whether the user has pushed those commits.
 
 Git trust is limited to this exact workspace through a `safe.directory` entry because the repository was initially created by the sandbox account. The approved brief's original content and existing whitespace are preserved.
 

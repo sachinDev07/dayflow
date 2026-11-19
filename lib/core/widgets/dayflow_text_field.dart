@@ -11,6 +11,7 @@ class DayflowTextField extends StatelessWidget {
     this.maxLines = 1,
     this.onChanged,
     this.textInputAction,
+    this.enabled = true,
   });
   final String label;
   final String? hint;
@@ -20,9 +21,11 @@ class DayflowTextField extends StatelessWidget {
   final int maxLines;
   final ValueChanged<String>? onChanged;
   final TextInputAction? textInputAction;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) => TextFormField(
+    enabled: enabled,
     controller: controller,
     validator: validator,
     autofocus: autofocus,

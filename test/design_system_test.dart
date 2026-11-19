@@ -11,6 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'support/shell_container.dart';
+
 double contrast(Color a, Color b) {
   final x = a.computeLuminance();
   final y = b.computeLuminance();
@@ -65,14 +67,23 @@ void main() {
     (tester) async {
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-      await tester.pumpWidget(const ProviderScope(child: DayflowApp()));
+      final container = shellContainer();
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const DayflowApp(),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(
         Theme.of(tester.element(find.byType(NavigationBar))).brightness,
         Brightness.light,
       );
       await tester.pumpWidget(
-        const ProviderScope(child: DayflowApp(themeMode: ThemeMode.system)),
+        UncontrolledProviderScope(
+          container: container,
+          child: const DayflowApp(themeMode: ThemeMode.system),
+        ),
       );
       await tester.pumpAndSettle();
       expect(

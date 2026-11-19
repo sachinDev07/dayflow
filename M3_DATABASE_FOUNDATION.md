@@ -1,6 +1,6 @@
 # M3: offline database foundation
 
-Started 18 November 2026 (Asia/Calcutta), from M2 commit `0f54526`. The approved product brief and design references remain unchanged. This milestone adds persistence infrastructure; it does not connect task forms, add visible features, or change appearance.
+Completed 18 November 2026 (Asia/Calcutta), from M2 commit `0f54526`; the database implementation is committed in `af80e6c`. The approved product brief and design references remain unchanged. This milestone adds persistence infrastructure; it does not connect task forms, add visible features, or change appearance.
 
 ## Architecture
 
@@ -92,7 +92,22 @@ The explicit `schema generate` command creates v1 verification helpers even thou
 flutter run --no-resident -t tool/database_smoke.dart -d <android-device-id>
 ```
 
-After verification, rebuild/run the regular `lib/main.dart` application so the delivered APK is the product shell, not the developer verification screen. Runtime verification results and final test counts are recorded after checks finish.
+After verification, rebuild/run the regular `lib/main.dart` application so the delivered APK is the product shell, not the developer verification screen.
+
+## Verification results
+
+Verified on 18 November 2026 (Asia/Calcutta):
+
+- Drift generation and v1 schema/helper generation succeeded. Formatting checks passed; `flutter analyze` reported no issues.
+- All 28 tests passed: 8 existing design/shell tests, 4 date utility tests, 14 repository/integrity tests, and 2 schema baseline tests. Coverage includes reactive reads, optional-value clearing, relationships, soft deletion/restoration, category-name conflicts, timestamp rules, settings validation, transactional rollback, query index use, file persistence, and preserving data when a newer schema is rejected.
+- Both the developer database verification APK and the regular main Android debug APK built successfully. The regular APK bundles native SQLite for ARM64, ARMv7, and x86_64, and retains the DAYFLOW label, `com.dayflow.dayflow`, minimum API 24, and target API 36.
+- The developer check passed on the Android 16/API 36 x86_64 emulator using bundled SQLite **3.54.1**. Tasks and linked notes survived a complete database connection close/reopen at the production path. Schema version 1, enabled foreign keys, and `integrity_check=ok` were verified; only the check's temporary fixture IDs were removed.
+- `adb shell run-as com.dayflow.dayflow ls -l files/dayflow.sqlite` independently confirmed the app-private file exists (53,248 bytes after the check). This validates the Android `context.filesDir` location rather than the separate Android databases directory.
+- The regular main APK replaced the developer build successfully. Its unchanged Home screen was visually reviewed, with no Flutter errors in the checked main-process logs. `build/m3-home.png` records that screen; `build/m3-database-verification.png` records the successful developer result (with an emulator System UI timeout dialog). These are ignored local artifacts. The final product APK is `build/app/outputs/flutter-apk/app-debug.apk`; `build/m3-database-smoke.apk` is developer-only. The emulator was stopped after verification to free host memory.
+
+Builds and emulator checks ran sequentially to limit memory pressure. The final check used 1,536 MB emulator RAM, 2 cores, software rendering, and a 720x1600 display override. Android cold boot and APK installation were slow, and an Android system-process timeout dialog appeared; the successful persistence result was confirmed in Flutter logs after fixture cleanup. These checks do not establish startup performance, physical-device coverage, older Android compatibility, or simultaneous Kotlin/Dart access.
+
+The approved product brief, design references, product UI, and native application source remain unchanged by M3. The next milestone is M4: Home dashboard, Quick Add, Add/Edit Task, completion/reopening, delete/undo, progress calculation, and empty states using the approved v4 task-flow references.
 
 ## References
 

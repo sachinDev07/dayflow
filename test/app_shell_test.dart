@@ -5,12 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'support/shell_container.dart';
+
 void main() {
   testWidgets('Launches Home and navigates all five destinations', (
     tester,
   ) async {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
+    final container = shellContainer();
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -51,7 +52,12 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-    await tester.pumpWidget(const ProviderScope(child: DayflowApp()));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: shellContainer(),
+        child: const DayflowApp(),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
 
